@@ -11,6 +11,8 @@ import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -54,6 +56,10 @@ public class SubscriptionService {
         int dueAmount = 0;
         int newAmount = 0;
         Subscription presentSubscription = subscriptionRepository.getSubscriptionByUserId(userId);
+
+        if (presentSubscription == null) {
+            throw new Exception("subscription not found");
+        }
         SubscriptionType subscriptionType = presentSubscription.getSubscriptionType();
 
         if (subscriptionType.toString().equals("ELITE")) {
@@ -85,6 +91,7 @@ public class SubscriptionService {
         //Hint is to use findAll function from the SubscriptionDb
         int totalAmount = 0;
         List<Subscription> allSubscriptions = subscriptionRepository.findAll();
+
 
         for (Subscription s: allSubscriptions) {
             totalAmount += s.getTotalAmountPaid();

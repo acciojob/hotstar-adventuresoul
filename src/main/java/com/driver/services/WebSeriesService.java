@@ -31,7 +31,8 @@ public class WebSeriesService {
         WebSeries webSeries = new WebSeries(webSeriesEntryDto.getSeriesName(), webSeriesEntryDto.getAgeLimit(),
                 webSeriesEntryDto.getRating(),webSeriesEntryDto.getSubscriptionType());
 
-        ProductionHouse prodHouse = productionHouseRepository.getOne(webSeriesEntryDto.getProductionHouseId());
+        ProductionHouse prodHouse = productionHouseRepository.findById(webSeriesEntryDto.getProductionHouseId())
+                .orElseThrow(() -> new Exception("Production House not found"));
 
         webSeries.setProductionHouse(prodHouse);
 
@@ -40,7 +41,7 @@ public class WebSeriesService {
         Double avgRating = webSeriesRepository.findAverageRatingByProductionHouseId(webSeriesEntryDto.getProductionHouseId());
         System.out.println("The average rating of prod house: " + avgRating);
 
-        prodHouse.setRatings(avgRating);
+        prodHouse.setRatings(avgRating != null ? avgRating : 0.0);
         productionHouseRepository.save(prodHouse);
 
         return 1;
