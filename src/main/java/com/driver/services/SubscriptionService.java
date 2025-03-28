@@ -46,12 +46,7 @@ public class SubscriptionService {
                                                         subscriptionEntryDto.getNoOfScreensRequired(),
                                                         new Date(), amount);
 
-        User user = userRepository.findById(subscriptionEntryDto.getUserId())
-                .orElse(null);;
-        if (user == null) {
-            System.out.println("User not found");
-            return -1;
-        }
+        User user = userRepository.getOne(subscriptionEntryDto.getUserId());
 
         newSubscription.setUser(user);
         subscriptionRepository.save(newSubscription);
@@ -68,30 +63,23 @@ public class SubscriptionService {
         int newAmount = 0;
         Subscription presentSubscription = subscriptionRepository.getSubscriptionByUserId(userId);
 
-        if (presentSubscription == null) {
-            throw new Exception("subscription not found");
-        }
         SubscriptionType subscriptionType = presentSubscription.getSubscriptionType();
 
         if (subscriptionType.toString().equals("ELITE")) {
             throw new Exception("Already the best Subscription");
         }
 
-        if (subscriptionType.toString().equals("BASIC")) {
+        if (subscriptionType == SubscriptionType.BASIC) {
             newAmount = 800 + (250 * presentSubscription.getNoOfScreensSubscribed());
-            dueAmount = newAmount - presentSubscription.getTotalAmountPaid();
-
             presentSubscription.setSubscriptionType(SubscriptionType.PRO);
-            presentSubscription.setTotalAmountPaid(newAmount);
         }
-        else if (subscriptionType.toString().equals("PRO")) {
+        else if (subscriptionType == SubscriptionType.PRO) {
             newAmount = 1000 + (350 * presentSubscription.getNoOfScreensSubscribed());
-            dueAmount = newAmount - presentSubscription.getTotalAmountPaid();
-
             presentSubscription.setSubscriptionType(SubscriptionType.ELITE);
-            presentSubscription.setTotalAmountPaid(newAmount);
         }
 
+        dueAmount = newAmount - presentSubscription.getTotalAmountPaid();
+        presentSubscription.setTotalAmountPaid(newAmount);
         subscriptionRepository.save(presentSubscription);
         return dueAmount;
     }

@@ -35,30 +35,41 @@ public class UserService {
     public Integer getAvailableCountOfWebSeriesViewable(Integer userId){
         //Return the count of all webSeries that a user can watch based on his ageLimit and subscriptionType
         //Hint: Take out all the Webseries from the WebRepository
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            System.out.println("User not found");
+        int count = 0;
+
+        User user = null;
+        try {
+            user = userRepository.findById(userId)
+                    .orElseThrow(() -> new Exception("User not found"));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
             return 0;
         }
 
-        Subscription subscription = subscriptionRepository.getSubscriptionByUserId(user.getId());
-        if (subscription == null) {
-            System.out.println("Subscription not found");
+        Subscription subscription = null;
+        try {
+            subscription = subscriptionRepository.getSubscriptionByUserId(user.getId());
+            if (subscription == null) {
+                throw new Exception("Subscription not found");
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
             return 0;
         }
+
+        SubscriptionType subscriptionType = subscription.getSubscriptionType();
 
         // now we have age and subscriptionType, fetch all web series and compare and get count
         // select count(*) from web_series w where age > w.age_limit and w.subscription_type = subscriptionType;
-        int userAge = user.getAge();
-        SubscriptionType subscriptionType = subscription.getSubscriptionType();
+
         List<WebSeries> webSeriesList = webSeriesRepository.findAll();
+        for (WebSeries w: webSeriesList) {
+            if (user.getAge() > w.getAgeLimit() && subscriptionType.equals(w.getSubscriptionType())) {
+                count++;
+            }
+        }
 
-        long count = webSeriesList.stream()
-                .filter(webSeries -> webSeries.getAgeLimit() < userAge && webSeries.getSubscriptionType() == subscriptionType)
-                .count();
-
-
-        return (int)count;
+        return count;
     }
 
 
