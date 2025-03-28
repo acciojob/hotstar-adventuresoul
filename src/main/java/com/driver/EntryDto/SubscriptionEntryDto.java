@@ -38,4 +38,13 @@ public class SubscriptionEntryDto {
     public void setNoOfScreensRequired(int noOfScreensRequired) {
         this.noOfScreensRequired = noOfScreensRequired;
     }
+
+    @Override
+    public String toString() {
+        return "SubscriptionEntryDto{" +
+                "userId=" + userId +
+                ", subscriptionType=" + subscriptionType +
+                ", noOfScreensRequired=" + noOfScreensRequired +
+                '}';
+    }
 }

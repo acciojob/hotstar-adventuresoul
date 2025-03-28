@@ -87,4 +87,13 @@ public class User {
     public void setSubscription(Subscription subscription) {
         this.subscription = subscription;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                ", mobNo='" + mobNo + '\'' +
+                '}';
+    }
 }
