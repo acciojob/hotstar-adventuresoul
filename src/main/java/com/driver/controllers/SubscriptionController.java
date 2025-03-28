@@ -17,7 +17,7 @@ public class SubscriptionController {
     public Integer buySubscription(@RequestBody SubscriptionEntryDto subscriptionEntryDto){
 
         //We need to buy subscription and save its relevant subscription to the db and return the finalAmount
-        System.out.println(subscriptionEntryDto);
+        //System.out.println(subscriptionEntryDto);
         return subscriptionService.buySubscription(subscriptionEntryDto);
     }
 

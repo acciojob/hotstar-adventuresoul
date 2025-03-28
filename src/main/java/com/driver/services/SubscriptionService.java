@@ -25,24 +25,35 @@ public class SubscriptionService {
     @Autowired
     UserRepository userRepository;
 
-    public Integer buySubscription(SubscriptionEntryDto subscriptionEntryDto){
+    private int calculateAmount(SubscriptionType subscriptionType, int numberOfScreens) {
+        if (subscriptionType == SubscriptionType.BASIC) {
+            return 500 + (200 * numberOfScreens);
+        }
+        else if (subscriptionType == SubscriptionType.ELITE) {
+            return 800 + (250 * numberOfScreens);
+        }
+        else {
+            return 1000 + (350 * numberOfScreens);
+        }
+    }
 
+    public Integer buySubscription(SubscriptionEntryDto subscriptionEntryDto) {
         //Save The subscription Object into the Db and return the total Amount that user has to pay
-        SubscriptionType type = subscriptionEntryDto.getSubscriptionType();
-        int numberOfScreens = subscriptionEntryDto.getNoOfScreensRequired();
-        int amount = 0;
-        if (type.toString().equals("BASIC")) {
-            amount = 500 + 200 * numberOfScreens;
-        }
-        else if (type.toString().equals("PRO")) {
-            amount = 800 + 250 * numberOfScreens;
-        }
-        else if (type.toString().equals("ELITE")) {
-            amount = 1000 + 350 * numberOfScreens;
+        int amount = calculateAmount(subscriptionEntryDto.getSubscriptionType(),
+                                        subscriptionEntryDto.getNoOfScreensRequired());
+
+        Subscription newSubscription = new Subscription(subscriptionEntryDto.getSubscriptionType(),
+                                                        subscriptionEntryDto.getNoOfScreensRequired(),
+                                                        new Date(), amount);
+
+        User user = userRepository.findById(subscriptionEntryDto.getUserId())
+                .orElse(null);;
+        if (user == null) {
+            System.out.println("User not found");
+            return -1;
         }
 
-        Subscription newSubscription = new Subscription(subscriptionEntryDto.getSubscriptionType(), numberOfScreens, new Date(), amount);
-        newSubscription.setUser(userRepository.getOne(subscriptionEntryDto.getUserId()));
+        newSubscription.setUser(user);
         subscriptionRepository.save(newSubscription);
 
         return amount;
